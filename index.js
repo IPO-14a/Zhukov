@@ -6,24 +6,18 @@ img.src = "img/background_blue.jpg";
 var imgCube = new Image();
 imgCube.src = "img/Cube_first.png";
 
-
-var platform = 400 - 70;
+var width = 800;
+var height = 400;
+var platform = height - 100;
 var y = platform;
-var speedJump = 5;
-var speedFall = 2;
-var heightJump = 100;
+var speedJump = 10;
+var speedFall = 5;
+var heightJump = 130;
 var isOnPlatform = true;
 var isJumping = false;
 var canJump = false;
-
-
-var keys = {
-	'W' : 87,
-	'A' : 65,
-	'D' : 68
-};
-
-var keyDown = 0;
+var speed = 5;
+var backPositionX = 0;
 
 function jump(){
 	if(isOnPlatform && canJump){
@@ -55,8 +49,12 @@ function checkGravity(){
 
 function drawRect(){
 	context.fillStyle = 'black';
-	context.clearRect(0, 0, 500, 400);
-	context.drawImage(img, 0, 0, 500, 400);
+	context.clearRect(0, 0, 800, 400);
+	if(backPositionX <= -width)
+		backPositionX = 0;
+	backPositionX -= speed;
+	context.drawImage(img, backPositionX, 0, width, height);
+	context.drawImage(img, backPositionX + width, 0, width, height);
 	context.drawImage(imgCube, 200, y, 100, 100);
 }
 
