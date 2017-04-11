@@ -6,12 +6,15 @@ img.src = "img/background_blue.jpg";
 var imgCube = new Image();
 imgCube.src = "img/Cube_first.png";
 
+var imgPlatform = new Image();
+imgPlatform.src = "img/platform.png";
+
 var width = 800;
 var height = 400;
 var platform = height - 100;
 var y = platform;
-var speedJump = 10;
-var speedFall = 5;
+var speedJump = 14;
+var speedFall = 10;
 var heightJump = 130;
 var isOnPlatform = true;
 var isJumping = false;
@@ -25,7 +28,7 @@ function jump(){
 		isJumping = true;
 		canJump = false;	
 	}
-	if(isJumping && platform != y + heightJump){
+	if(isJumping && platform < y + heightJump){
 		y -= speedJump;
 	}else{
 		isJumping = false;
@@ -34,7 +37,8 @@ function jump(){
 
 window.onload = function(){
 	window.onkeydown = function(e){
-		if(isOnPlatform && e.keyCode == 87)
+		console.log(e.keyCode);
+		if(isOnPlatform && e.keyCode == 32)
 			canJump = true;
 	};
 }
@@ -55,16 +59,18 @@ function drawRect(){
 	backPositionX -= speed;
 	context.drawImage(img, backPositionX, 0, width, height);
 	context.drawImage(img, backPositionX + width, 0, width, height);
-	context.drawImage(imgCube, 200, y, 100, 100);
+	context.drawImage(imgPlatform, backPositionX, 400 - 50, width, 50);
+	context.drawImage(imgPlatform, backPositionX + width - 5, 400 - 50, width, 50);
+	context.drawImage(imgCube, 200, y, 50, 50);
 }
 
 var gameLoop = function() {
 	jump();
 	checkGravity()
 	drawRect(); 
-	requestAnimationFrame(gameLoop);
+//	requestAnimationFrame(gameLoop);
 }
 
 
 
-gameLoop();
+setInterval(gameLoop, 1000/60);
