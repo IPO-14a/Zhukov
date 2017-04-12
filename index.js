@@ -1,10 +1,15 @@
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
-var img = new Image();
-img.src = "img/background_blue.jpg";
+context.fillStyle = 'black';
 
-var imgCube = new Image();
-imgCube.src = "img/Cube_first.png";
+var imgBackground = new Image();
+imgBackground.src = "img/background_blue.jpg";
+
+var imgCube_first = new Image();
+imgCube_first.src = "img/Cube_first.png";
+
+var imgCube_second = new Image();
+imgCube_second.src = "img/Cube_second.png";
 
 var imgPlatform = new Image();
 imgPlatform.src = "img/platform.png";
@@ -12,88 +17,104 @@ imgPlatform.src = "img/platform.png";
 var imgWall = new Image();
 imgWall.src = "img/wall.png";
 
-var width = 800;
-var height = 400;
-var platform = height - 100;
-var y = platform;
-var position = y;
-var speedJump = 10;
-var speedFall = 5;
-var heightJump = 130;
-var isOnPlatform = true;
-var isJumping = false;
-var canJump = false;
-var speed = 5;
-var backPositionX = 0;
+var field = {
+    height : 400,
+    width : 800,
+    x : 0,
+    speed : 10,
+    nextX : function(){
+        if (this.x <= -this.width)
+            this.x = 0;
+        this.x -= this.speed;
+    }
+};
 
-function jump(){
-	if(isOnPlatform && canJump){
-		isOnPlatform = false;
-		isJumping = true;
-		canJump = false;	
-	}
-	if(isJumping && platform < y + heightJump){
-		y -= speedJump;
-	}else{
-		isJumping = false;
-	}
+var user = {
+    y : 300,
+    heightJump : 130,
+    platform : 300,
+    isOnPlatform : true,
+    canJump : false,
+    isJumping : false,
+    speedJump : 10,
+    speedFall : 5,
+    jump : function () {
+        if (this.isOnPlatform && this.canJump) {
+            this.isOnPlatform = false;
+            this.isJumping = true;
+            this.canJump = false;    
+        }
+        if (this.isJumping && this.platform < this.y + this.heightJump) {
+            this.y -= this.speedJump;
+        } else {
+            this.isJumping = false;
+        }
+    },
+    checkGravity : function() {
+        if (!this.isJumping && this.y != this.platform && !this.isOnPlatform) {
+            this.y += this.speedFall;
+        } else if (this.y == this.platform) {
+            this.isOnPlatform = true;
+        }
+    }
+};
+
+function checkCollision(x, y, width, height) {
+    console.log(field.x);
+    if (field.x < x + width && field.x > x - width  && user.y > y - height) {
+        console.log("gg");
+        field.speed = 0;
+    }
+    else if ( field.x < x + width && field.x > x - width && user.y == y - height 
+        && !user.isJumping) {
+        console.log("yeah");
+        user.isOnPlatform = true;
+    }
+    else if ( field.x == x - width) {
+        console.log("yeahdddddddddd");
+        user.isOnPlatform = false;
+    }
+};
+ 
+window.onload = function() {
+    window.onkeydown = function(e) {
+        if (user.isOnPlatform && e.keyCode == 32) {
+            user.canJump = true;
+            user.heightJump = 130 + (user.y - 300) * -1;
+        }
+    };
+};
+
+function checkGravity() {
+    if (!isJumping && y != platform && !isOnPlatform) {
+       y += speedFall;
+    } else if (y == platform) {
+       isOnPlatform = true;
+    }
+};
+
+function drawField() {
+    context.clearRect(0, 0, 800, 400);
+    field.nextX();
+    context.drawImage(imgBackground, field.x, 0, field.width, field.height);
+    context.drawImage(imgBackground, field.x + field.width, 0, field.width, field.height);
+    context.drawImage(imgPlatform, field.x, 400 - 50, field.width, 50);
+    context.drawImage(imgPlatform, field.x + field.width - 5, 400 - 50, field.width, 50);
 }
 
-function checkCollision(){
-	//console.log(backPositionX);
-	if(backPositionX < -600 + 50 && backPositionX > -650  && y > 400 - 150)
-		console.log("ggg");
-	else if( backPositionX < -600 + 50 && backPositionX > -650 && y == 400 - 150 && !isJumping){
-		console.log("yeah");
-		isOnPlatform = true;
-	}
-	else
-		isOnPlatform = false;
-
-}
-
-window.onload = function(){
-	window.onkeydown = function(e){
-		console.log(e.keyCode);
-		if(isOnPlatform && e.keyCode == 32){
-			canJump = true;
-			console.log(y);
-			heightJump = 130 + (y - 300) * -1;
-		}
-	};
-}
-
-function checkGravity(){
-	if(!isJumping && y != platform && !isOnPlatform){
-		y += speedFall;
-	}else if(y == platform){
-		isOnPlatform = true;
-	}
-}
-
-function draw(){
-	context.fillStyle = 'black';
-	context.clearRect(0, 0, 800, 400);
-	if(backPositionX <= -width)
-		backPositionX = 0;
-	backPositionX -= speed;
-	context.drawImage(img, backPositionX, 0, width, height);
-	context.drawImage(img, backPositionX + width, 0, width, height);
-	context.drawImage(imgWall, backPositionX, 400 - 100, 50, 50);
-	context.drawImage(imgWall, backPositionX + width, 400 - 100, 50, 50);
-	context.drawImage(imgPlatform, backPositionX, 400 - 50, width, 50);
-	context.drawImage(imgPlatform, backPositionX + width - 5, 400 - 50, width, 50);
-	context.drawImage(imgCube, 200, y, 50, 50);
-}
+function draw() {
+    context.drawImage(imgWall, field.x, 400 - 100, 50, 50);
+    context.drawImage(imgWall, field.x + field.width, 400 - 100, 50, 50);
+    context.drawImage(imgCube_first, 200, user.y, 50, 50);
+};
 
 var gameLoop = function() {
-	jump();
-	checkCollision();
-	checkGravity()
-	draw(); 
-//	requestAnimationFrame(gameLoop);
-}
+    checkCollision( -600, 400 - 100, 50, 50);
+    user.jump();
+    user.checkGravity();
+    drawField();
+    draw(); 
+    requestAnimationFrame(gameLoop);
+};
 
-
-
-setInterval(gameLoop, 1000/60);
+gameLoop();
