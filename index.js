@@ -17,17 +17,73 @@ imgPlatform.src = "img/platform.png";
 var imgWall = new Image();
 imgWall.src = "img/wall.png";
 
+var imgTriangle = new Image();
+imgTriangle.src = "img/triangle.png";
+
 var field = {
     height : 400,
     width : 800,
     x : 0,
     speed : 10,
+    
     nextX : function(){
         if (this.x <= -this.width)
             this.x = 0;
         this.x -= this.speed;
     }
 };
+
+Cell = {
+    x : 0,
+    y : 300,
+    height : 50,
+    width : 50,
+
+    draw : function() {
+        this.x -= field.speed;
+        context.drawImage(imgWall, this.x, this.y, this.width, this.height);
+    },
+
+    checkCollision : function() {
+        console.log(this.x);
+
+        if (210 < this.x + this.width + 10 && 210 > this.x - this.width && user.y > this.y - this.height
+            && user.y < this.y + this.height) {
+            field.speed = 0;
+        }
+        else if ( 210 < this.x + this.width + 10 && 210 > this.x - this.width - 10 && user.y == this.y - this.height && !user.isJumping) {
+            console.log("yeah");
+            user.isOnPlatform = true;
+        }
+        else if ( 210 == this.x + 100) {
+            console.log("yeahdddddddddd");
+            user.isOnPlatform = false;
+        }
+    }
+};
+
+CellTriangle = {
+    x : 0,
+    y : 300,
+    height : 50,
+    width : 50,
+
+    draw : function() {
+        this.x -= field.speed;
+        context.drawImage(imgTriangle, this.x, this.y, this.width, this.height);
+    },
+
+    checkCollision : function() {
+        console.log(this.x);
+
+        if (210 < this.x + this.width + 10 && 210 > this.x - this.width && user.y >= this.y - this.height
+            && user.y < this.y + this.height) {
+            field.speed = 0;
+        }
+    }
+}
+
+
 
 var user = {
     y : 300,
@@ -103,17 +159,39 @@ function drawField() {
 }
 
 function draw() {
-    context.drawImage(imgWall, field.x, 400 - 100, 50, 50);
-    context.drawImage(imgWall, field.x + field.width, 400 - 100, 50, 50);
     context.drawImage(imgCube_first, 200, user.y, 50, 50);
 };
 
+var cell = Object.create(Cell);
+
+var newCell = Object.create(Cell);
+
+var newCell1 = Object.create(Cell);
+
+var newTriangle = Object.create(CellTriangle);
+
+newCell.x = 900;
+cell.x = 1100;
+cell.y = cell.y - 60;
+newCell1.x = 1350;
+newCell1.y = newCell1.y - 100; 
+newTriangle.x = 1500;
+
 var gameLoop = function() {
-    checkCollision( -600, 400 - 100, 50, 50);
+    //checkCollision( -600, 400 - 100, 50, 50);
+    
+    newTriangle.checkCollision();
+    cell.checkCollision();
+    newCell.checkCollision();
+    newCell1.checkCollision();
     user.jump();
     user.checkGravity();
     drawField();
     draw(); 
+    cell.draw();
+    newCell.draw();
+    newCell1.draw();
+    newTriangle.draw();
     requestAnimationFrame(gameLoop);
 };
 
