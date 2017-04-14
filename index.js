@@ -23,8 +23,9 @@ imgTriangle.src = "img/triangle.png";
 var field = {
     height : 400,
     width : 800,
+    isLose : false,
     x : 0,
-    speed : 10,
+    speed : 8,
     
     nextX : function(){
         if (this.x <= -this.width)
@@ -39,24 +40,24 @@ Cell = {
     height : 50,
     width : 50,
 
-    draw : function() {
+    nextX : function() {
         this.x -= field.speed;
+    },
+
+    draw : function() {
         context.drawImage(imgWall, this.x, this.y, this.width, this.height);
     },
 
     checkCollision : function() {
-        console.log(this.x);
-
-        if (210 < this.x + this.width + 10 && 210 > this.x - this.width && user.y > this.y - this.height
+        if (250 > this.x && 200 < this.x + this.width && user.y > this.y - this.height
             && user.y < this.y + this.height) {
             field.speed = 0;
+            field.isLose = true;
         }
-        else if ( 210 < this.x + this.width + 10 && 210 > this.x - this.width - 10 && user.y == this.y - this.height && !user.isJumping) {
-            console.log("yeah");
+        else if (250 > this.x && 200 < this.x + this.width && user.y == this.y - this.height && !user.isJumping) {
             user.isOnPlatform = true;
         }
-        else if ( 210 == this.x + 100) {
-            console.log("yeahdddddddddd");
+        else if ( 200 > this.x + this.width + 20 && 200 < this.x + this.width + 30) {
             user.isOnPlatform = false;
         }
     }
@@ -68,32 +69,36 @@ CellTriangle = {
     height : 50,
     width : 50,
 
-    draw : function() {
+    nextX : function() {
         this.x -= field.speed;
+    },
+
+    draw : function() {
         context.drawImage(imgTriangle, this.x, this.y, this.width, this.height);
     },
 
     checkCollision : function() {
-        console.log(this.x);
-
-        if (210 < this.x + this.width + 10 && 210 > this.x - this.width && user.y >= this.y - this.height
+        if (250 > this.x && 200 < this.x + this.width && 
+            user.y > this.y - this.height
             && user.y < this.y + this.height) {
+          
             field.speed = 0;
+            field.isLose = true;
         }
     }
 }
 
-
-
 var user = {
     y : 300,
-    heightJump : 130,
+    heightJump : 140,
     platform : 300,
     isOnPlatform : true,
     canJump : false,
     isJumping : false,
     speedJump : 10,
-    speedFall : 5,
+    speedFall : 10,
+    loseUp : true,
+
     jump : function () {
         if (this.isOnPlatform && this.canJump) {
             this.isOnPlatform = false;
@@ -106,29 +111,24 @@ var user = {
             this.isJumping = false;
         }
     },
+
     checkGravity : function() {
         if (!this.isJumping && this.y != this.platform && !this.isOnPlatform) {
-            this.y += this.speedFall;
+            this.y += this.y + this.speedFall < this.platform ?
+             this.speedFall : this.platform - this.y;
         } else if (this.y == this.platform) {
             this.isOnPlatform = true;
         }
-    }
-};
+    },
 
-function checkCollision(x, y, width, height) {
-    console.log(field.x);
-    if (field.x < x + width && field.x > x - width  && user.y > y - height) {
-        console.log("gg");
-        field.speed = 0;
-    }
-    else if ( field.x < x + width && field.x > x - width && user.y == y - height 
-        && !user.isJumping) {
-        console.log("yeah");
-        user.isOnPlatform = true;
-    }
-    else if ( field.x == x - width) {
-        console.log("yeahdddddddddd");
-        user.isOnPlatform = false;
+    lose : function() {
+
+        if(this.y > 0 && this.loseUp)
+            this.y -= 5; 
+        else{
+            this.y += 10;
+            this.loseUp = false;
+        }
     }
 };
  
@@ -141,19 +141,11 @@ window.onload = function() {
     };
 };
 
-function checkGravity() {
-    if (!isJumping && y != platform && !isOnPlatform) {
-       y += speedFall;
-    } else if (y == platform) {
-       isOnPlatform = true;
-    }
-};
+x = 0;
 
 function drawField() {
-    context.clearRect(0, 0, 800, 400);
-    field.nextX();
-    context.drawImage(imgBackground, field.x, 0, field.width, field.height);
-    context.drawImage(imgBackground, field.x + field.width, 0, field.width, field.height);
+    context.drawImage(imgBackground, x, 0, field.width, field.height);
+    context.drawImage(imgBackground, x + field.width - 5, 0, field.width, field.height);
     context.drawImage(imgPlatform, field.x, 400 - 50, field.width, 50);
     context.drawImage(imgPlatform, field.x + field.width - 5, 400 - 50, field.width, 50);
 }
@@ -171,22 +163,80 @@ var newCell1 = Object.create(Cell);
 var newTriangle = Object.create(CellTriangle);
 
 newCell.x = 900;
-cell.x = 1100;
+newCell.y = newCell.y - 60;
+cell.x = 1500;
+cell.width = 50;
 cell.y = cell.y - 60;
 newCell1.x = 1350;
 newCell1.y = newCell1.y - 100; 
 newTriangle.x = 1500;
+newTriangle.width = 50;
+newTriangle.height = 50;
+newTriangle.y = user.platform + 30;
 
-var gameLoop = function() {
-    //checkCollision( -600, 400 - 100, 50, 50);
+var elements = [];
+var i = 0;
+var distance = 0;
+
+function fieldX(){
+    for(var j = 0; j < elements.length; j++){
+        elements[j].checkCollision();
+        elements[j].nextX();
+        elements[j].draw();
+    }
+}
+
+function fieldGenerate(){
     
-    newTriangle.checkCollision();
-    cell.checkCollision();
-    newCell.checkCollision();
-    newCell1.checkCollision();
-    user.jump();
-    user.checkGravity();
+    console.log("do " + elements.length);
+
+    if(elements.length > 0){
+        console.log("eee.x" + elements[0].x);
+        while(elements[0].x < 0){
+            elements.shift();
+        }
+    }
+
+    
+    console.log("posle length " + elements.length);
+
+    if(elements.length  < 20){
+        distance += 50;
+        var cell = Object.create(Cell);
+        cell.x = distance + field.width;
+        elements.push( cell );
+    }else
+        distance = elements[19].x - field.width;
+};
+
+
+function gameLoop() {
+   
+    console.log(field.isLose);
+    context.clearRect(0, 0, 800, 400);
     drawField();
+     fieldGenerate();
+    fieldX();
+    if ( !field.isLose ) {
+      if (x < -790)
+        x = 0;
+        x -= 1;
+        field.nextX();
+        user.jump();
+        newTriangle.nextX();
+        cell.nextX();
+        //newCell1.nextX();
+        newCell.nextX();
+        newTriangle.checkCollision();
+        newCell.checkCollision(); 
+      //  cell.checkCollision();
+        
+        newCell1.checkCollision();
+        user.checkGravity();
+        
+    } else {
+        user.lose();  
+    } 
     draw(); 
     cell.draw();
     newCell.draw();
