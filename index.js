@@ -139,6 +139,9 @@ window.onload = function() {
             user.heightJump = 130 + (user.y - 300) * -1;
         }
     };
+
+    initMap();
+    gameLoop();
 };
 
 x = 0;
@@ -154,95 +157,88 @@ function draw() {
     context.drawImage(imgCube_first, 200, user.y, 50, 50);
 };
 
-var cell = Object.create(Cell);
-
-var newCell = Object.create(Cell);
-
-var newCell1 = Object.create(Cell);
-
-var newTriangle = Object.create(CellTriangle);
-
-newCell.x = 900;
-newCell.y = newCell.y - 60;
-cell.x = 1500;
-cell.width = 50;
-cell.y = cell.y - 60;
-newCell1.x = 1350;
-newCell1.y = newCell1.y - 100; 
-newTriangle.x = 1500;
-newTriangle.width = 50;
-newTriangle.height = 50;
-newTriangle.y = user.platform + 30;
-
 var elements = [];
-var i = 0;
-var distance = 0;
+var countGenerate = 0;
+var distance = [];
+var allDistance = 0;
+var map = ["0000000 10  0 0 0 0 1", 
+           "0000000"];
+map.reverse();
 
-function fieldX(){
-    for(var j = 0; j < elements.length; j++){
-        elements[j].checkCollision();
-        elements[j].nextX();
-        elements[j].draw();
+function fieldX(i) {
+    for (var j = 0; j < elements[i].length; j++) {
+        elements[i][j].checkCollision();
+        elements[i][j].nextX();
+        elements[i][j].draw();
     }
 }
 
-function fieldGenerate(){
-    
-    console.log("do " + elements.length);
-
-    if(elements.length > 0){
-        console.log("eee.x" + elements[0].x);
-        while(elements[0].x < 0){
-            elements.shift();
-        }
+function initMap(){
+    for (var i = 0; i < map.length; i++) {
+        elements.push([]);
+        distance.push(0);
     }
+}
 
+function generateMap(){
+    allDistance += field.speed;    
+    for (var i = 0; i < map.length; i++) {
+        generateRow(i);
+        fieldX(i);
+    }
+}
+
+function generateRow(i) {
     
-    console.log("posle length " + elements.length);
+    if (countGenerate + 1 < map[i].length){
+        if (elements[i].length > 0) {
+            while (elements[i].x < 0) {
+                elements.shift();
+            }
+        }
 
-    if(elements.length  < 20){
-        distance += 50;
-        var cell = Object.create(Cell);
-        cell.x = distance + field.width;
-        elements.push( cell );
-    }else
-        distance = elements[19].x - field.width;
+        if (elements.length  < 20) {
+            distance[i] += 50;
+
+            if (map[i][countGenerate] == "0") {
+                var cell = Object.create(Cell);
+                cell.x = distance[i] + field.width;
+                cell.y = cell.y - 50 * i;
+                elements[i].push( cell );
+            } else if (map[i][countGenerate] == "1"){
+                var cell = Object.create(CellTriangle);
+                cell.x = distance[i] + field.width;
+                cell.y = cell.y - 50 * i;
+                elements[i].push( cell );
+            }
+            
+        } else
+           distance[i] = elements[19].x - field.width;
+        console.log(elements.length);
+        countGenerate++;
+    }
+    if( allDistance > map[0].length * 50)
+        console.log("you win!");
 };
-
 
 function gameLoop() {
    
     console.log(field.isLose);
     context.clearRect(0, 0, 800, 400);
     drawField();
-     fieldGenerate();
-    fieldX();
+    generateMap();
+
     if ( !field.isLose ) {
       if (x < -790)
         x = 0;
         x -= 1;
         field.nextX();
         user.jump();
-        newTriangle.nextX();
-        cell.nextX();
-        //newCell1.nextX();
-        newCell.nextX();
-        newTriangle.checkCollision();
-        newCell.checkCollision(); 
-      //  cell.checkCollision();
-        
-        newCell1.checkCollision();
         user.checkGravity();
-        
+
     } else {
         user.lose();  
     } 
     draw(); 
-    cell.draw();
-    newCell.draw();
-    newCell1.draw();
-    newTriangle.draw();
     requestAnimationFrame(gameLoop);
 };
-
-gameLoop();
