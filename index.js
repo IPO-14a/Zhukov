@@ -20,6 +20,8 @@ imgWall.src = "img/wall.png";
 var imgTriangle = new Image();
 imgTriangle.src = "img/triangle.png";
 
+var backAudio = document.getElementById("backAudio");
+
 var field = {
     height : 400,
     width : 800,
@@ -159,7 +161,7 @@ window.onload = function() {
             user.heightJump = 130 + (user.y - 300) * -1;
         }
     };
-
+    backAudio.play();
     initMap();
     gameLoop();
 };
@@ -259,8 +261,6 @@ function generateRow(i) {
 function gameLoop() {
     context.clearRect(0, 0, 800, 400);
     
-    
-
     if ( !field.isLose ) {
         field.nextX();
         drawField();
