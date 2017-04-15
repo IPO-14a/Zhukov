@@ -51,18 +51,15 @@ Cell = {
     checkCollision : function() {
         if (250 > this.x && 200 < this.x + this.width && user.y > this.y - this.height
             && user.y < this.y + this.height) {
-            console.log(this.y + "  " + user.y);
             field.speed = 0;
             field.isLose = true;
 
         }
         else if (255 >= this.x && 205 <= this.x + this.width && user.y == this.y - this.height && !user.isJumping) {
             user.isOnPlatform = true;
-            console.log(this.y + "  " + user.y);
         }
         else if ( 200 > this.x + this.width && 200 < this.x + this.width + 10 && this.y == user.y + 50) {
             user.isOnPlatform = false;
-            console.log("ddd + " + this.y);
         }
     }
 };
@@ -89,6 +86,25 @@ CellTriangle = {
             field.speed = 0;
             field.isLose = true;
         }
+    }
+}
+
+CellBlank = {
+    x : 0,
+    y : 300,
+    height : 50,
+    width : 50,
+
+    nextX : function() {
+
+    },
+
+    draw : function() {
+
+    },
+
+    checkCollision : function() {
+
     }
 }
 
@@ -167,13 +183,13 @@ var distance = [];
 var allDistance = 0;
 var map = 
         [ 
-            "000000000000000000  ",
-            "",
-            "",
-            "                000",
-            "            00     ",
-            "       0001100     ",
-            "00000000000000000  ",
+            "                                                 ",
+            "                                                 ",
+            "                                                 ",
+            "                000                000           ",
+            "            00                 00 000            ",
+            "       0001100            000  00 000          00",
+            "00000000000000000    1000 000110001000011110   00",
        ];
 
 map.reverse();
@@ -204,34 +220,40 @@ function generateMap(){
 }
 
 function generateRow(i) {
-    
     if (countGenerate[i] + 1 < map[i].length){
         if (elements[i].length > 0) {
-            while (elements[i][0].x < 0) {
-                elements.shift();
+            console.log(elements[i][0].x);
+            if (elements[i][0].x < 0) {
+                elements[i].shift();
             }
         }
 
-        if (elements[i].length < 20) {
+      //  if (elements[i].length < 20) {
             distance[i] += 50;
-            if (map[i][ countGenerate[i] ] === "0") {
+            if (map[i][ countGenerate[i] ] == "0") {
                 var cell = Object.create(Cell);
                 cell.x = distance[i] + field.width;
                 cell.y = cell.y - 50 * i;
                 elements[i].push( cell );
-            } else if (map[i][ countGenerate[i] ] === "1") {
+            } else if (map[i][ countGenerate[i] ] == "1") {
                 var cell = Object.create(CellTriangle);
                 cell.x = distance[i] + field.width;
                 cell.y = cell.y - 50 * i;
                 elements[i].push( cell );
+            } else if(map[i][ countGenerate[i] ] == " ") {
+                var cell = Object.create(CellBlank);
+                cell.x = distance[i] + field.width; 
+                elements[i].push( cell );
+        
             }
-            
-        } else
-           distance[i] = elements[19].x - field.width;
-        countGenerate[i]++;
+            countGenerate[i]++;    
+        //} else {
+        //   distance[i] =  elements[i][19].x - field.width;
+        //}
+        
     }
-    if (allDistance > map[i].length * 50)
-        console.log("you win!");
+    //if (allDistance > map[i].length * 50)
+        //console.log("you win!");
 };
 
 function gameLoop() {
