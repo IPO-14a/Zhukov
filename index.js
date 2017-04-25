@@ -26,6 +26,9 @@ imgUnMute.src = "img/unMute.png";
 var imgMute = new Image();
 imgMute.src = "img/Mute.png";
 
+var imgRestart = new Image();
+imgRestart.src = "img/restart.png";
+
 var backAudio = document.getElementById("backAudio");
 
 var field = {
@@ -95,7 +98,7 @@ CellTriangle = {
             field.isLose = true;
         }
     }
-}
+};
 
 CellBlank = {
     x : 0,
@@ -114,7 +117,7 @@ CellBlank = {
     checkCollision : function() {
 
     }
-}
+};
 
 var user = {
     y : 300,
@@ -179,7 +182,7 @@ function drawField() {
     context.drawImage(imgBackground, x + field.width - 5, 0, field.width, field.height);
     context.drawImage(imgPlatform, field.x, 400 - 50, field.width, 50);
     context.drawImage(imgPlatform, field.x + field.width - 5, 400 - 50, field.width, 50);
-}
+};
 
 function draw() {
     context.drawImage(imgCube_first, 200, user.y, 50, 50);
@@ -207,7 +210,7 @@ function makeRow(i) {
         elements[i][j].nextX();
         elements[i][j].draw();
     }
-}
+};
 
 function initMap() {
     for (var i = 0; i < map.length; i++) {
@@ -215,7 +218,13 @@ function initMap() {
         distance.push(0);
         countGenerate.push(0);
     }
-}
+};
+
+function restartMap() {
+    elements.length = 0;
+    distance.length = 0;
+    countGenerate.length = 0;
+};
 
 function generateMap() {
     allDistance += field.speed;    
@@ -223,7 +232,7 @@ function generateMap() {
         generateRow(i);
         makeRow(i);
     }
-}
+};
 
 function generateRow(i) {
     if (countGenerate[i] + 1 < map[i].length) {
@@ -254,20 +263,27 @@ function generateRow(i) {
 
 function drawButton(button){
     context.drawImage(button.image, button.x, button.y, button.w, button.h);
-}
+};
 
-function Button(x, y, w, h, state, image) {
+function Button(x, y, w, h, state, image, type) {
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
     this.state = state;
     this.image = image;
+    this.type = type;
 };
 
 var buttons = Array();
-buttons.push( new Button(0, 0, 50, 50, true, imgUnMute) );
+buttons.push( new Button(0, 0, 50, 50, true, imgUnMute, "volume") );
+buttons.push( new Button(field.width - 50, 0, 50, 50, true, imgRestart, "restart") );
 
+function drawButtons(){
+    for (var i = 0; i < buttons.length; i++) {
+        drawButton(buttons[i]);
+    }
+}
 
 function gameLoop() {
     context.clearRect(0, 0, 800, 400);
@@ -278,26 +294,43 @@ function gameLoop() {
         user.jump();
         user.checkGravity();
     } else {
-        user.lose();  
+        
+        //user.lose();  
     } 
     draw(); 
-    drawButton(buttons[0]);
+    drawButtons();
     requestAnimationFrame(gameLoop);
 };
+
+function buttonVolume(button){
+     if (button.state) {
+            button.state = false;
+            backAudio.volume = 0;
+            button.image = imgMute;
+        } else {
+            button.state = true;
+            backAudio.volume = 1;
+            button.image = imgUnMute;
+        }
+}; 
+
+function buttonRestart(button){
+    field.isLose = false;
+    restartMap();
+    initMap();
+    field.speed = 8;
+    user.y = 300;
+}; 
 
 canvas.onmousedown = function(e) {
     var mouse = console.log(e.x + " " + e.y);
     for (var i = 0; i < buttons.length; i++) {
-        if (e.x > buttons[i].x && e.x < buttons[i].x+buttons[i].w && e.y > buttons[i].y && e.y < buttons[i].y+buttons[i].h) {
-            if (buttons[i].state) {
-                buttons[i].state = false;
-                backAudio.volume = 0;
-                buttons[i].image = imgMute;
-            } else {
-                buttons[i].state = true;
-                backAudio.volume = 1;
-                buttons[i].image = imgUnMute;
-            }
+        if (e.x > buttons[i].x && e.x < buttons[i].x + buttons[i].w &&
+         e.y > buttons[i].y && e.y < buttons[i].y + buttons[i].h) {
+            if (buttons[i].type === "volume")
+                buttonVolume(buttons[i]);
+            else if (buttons[i].type === "restart")
+                buttonRestart(buttons[i]);
         }
     }
-}
+};
