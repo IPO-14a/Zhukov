@@ -29,7 +29,7 @@ var field = {
     x : 0,
     speed : 8,
     
-    nextX : function(){
+    nextX : function() {
         if (this.x <= -this.width)
             this.x = 0;
         this.x -= this.speed;
@@ -144,10 +144,10 @@ var user = {
     },
 
     lose : function() {
-
-        if(this.y > 0 && this.loseUp)
+        if (this.y > 0 && this.loseUp) {
             this.y -= 5; 
-        else{
+        }
+        else {
             this.y += 10;
             this.loseUp = false;
         }
@@ -183,8 +183,7 @@ var elements = [];
 var countGenerate = [];
 var distance = [];
 var allDistance = 0;
-var map = 
-        [ 
+var map = [
             "                                                 ",
             "                                                 ",
             "                                                 ",
@@ -192,7 +191,7 @@ var map =
             "            00                 00 000            ",
             "       0001100            000  00 000          00",
             "00000000000000000    1000 000110001000011110   00",
-       ];
+        ];
 
 map.reverse();
 
@@ -204,7 +203,7 @@ function makeRow(i) {
     }
 }
 
-function initMap(){
+function initMap() {
     for (var i = 0; i < map.length; i++) {
         elements.push([]);
         distance.push(0);
@@ -212,50 +211,40 @@ function initMap(){
     }
 }
 
-function generateMap(){
+function generateMap() {
     allDistance += field.speed;    
     for (var i = 0; i < map.length; i++) {
         generateRow(i);
         makeRow(i);
-  //      console.log(i);
     }
 }
 
 function generateRow(i) {
-    if (countGenerate[i] + 1 < map[i].length){
+    if (countGenerate[i] + 1 < map[i].length) {
         if (elements[i].length > 0) {
             console.log(elements[i][0].x);
             if (elements[i][0].x < 0) {
                 elements[i].shift();
             }
         }
-
-      //  if (elements[i].length < 20) {
-            distance[i] += 50;
-            if (map[i][ countGenerate[i] ] == "0") {
-                var cell = Object.create(Cell);
-                cell.x = distance[i] + field.width;
-                cell.y = cell.y - 50 * i;
-                elements[i].push( cell );
-            } else if (map[i][ countGenerate[i] ] == "1") {
-                var cell = Object.create(CellTriangle);
-                cell.x = distance[i] + field.width;
-                cell.y = cell.y - 50 * i;
-                elements[i].push( cell );
-            } else if(map[i][ countGenerate[i] ] == " ") {
-                var cell = Object.create(CellBlank);
-                cell.x = distance[i] + field.width; 
-                elements[i].push( cell );
-        
-            }
-            countGenerate[i]++;    
-        //} else {
-        //   distance[i] =  elements[i][19].x - field.width;
-        //}
-        
+        distance[i] += 50;
+        if (map[i][ countGenerate[i] ] == "0") {
+            var cell = Object.create(Cell);
+            cell.x = distance[i] + field.width;
+            cell.y = cell.y - 50 * i;
+            elements[i].push( cell );
+        } else if (map[i][ countGenerate[i] ] == "1") {
+            var cell = Object.create(CellTriangle);
+            cell.x = distance[i] + field.width;
+            cell.y = cell.y - 50 * i;
+            elements[i].push( cell );
+        } else if (map[i][ countGenerate[i] ] == " ") {
+            var cell = Object.create(CellBlank);
+            cell.x = distance[i] + field.width; 
+            elements[i].push(cell);
+        }
+        countGenerate[i]++;           
     }
-    //if (allDistance > map[i].length * 50)
-        //console.log("you win!");
 };
 
 function gameLoop() {
