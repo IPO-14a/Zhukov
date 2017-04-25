@@ -20,6 +20,9 @@ imgWall.src = "img/wall.png";
 var imgTriangle = new Image();
 imgTriangle.src = "img/triangle.png";
 
+var imgUnMute = new Image();
+imgUnMute.src = "img/mute.png";
+
 var backAudio = document.getElementById("backAudio");
 
 var field = {
@@ -222,7 +225,6 @@ function generateMap() {
 function generateRow(i) {
     if (countGenerate[i] + 1 < map[i].length) {
         if (elements[i].length > 0) {
-            console.log(elements[i][0].x);
             if (elements[i][0].x < 0) {
                 elements[i].shift();
             }
@@ -247,6 +249,23 @@ function generateRow(i) {
     }
 };
 
+function drawButton(button){
+    context.drawImage(button.image, button.x, button.y, button.w, button.h);
+}
+
+function Button(x, y, w, h, state, image) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.state = state;
+    this.image = image;
+};
+
+var buttons = Array();
+buttons.push( new Button(0, 0, 50, 50, true, imgUnMute) );
+
+
 function gameLoop() {
     context.clearRect(0, 0, 800, 400);
     
@@ -260,5 +279,21 @@ function gameLoop() {
         user.lose();  
     } 
     draw(); 
+    drawButton(buttons[0]);
     requestAnimationFrame(gameLoop);
 };
+
+canvas.onmousedown = function(e) {
+    var mouse = console.log(e.x + " " + e.y);
+    for (var i = 0; i < buttons.length; i++) {
+        if (e.x > buttons[i].x && e.x < buttons[i].x+buttons[i].w && e.y > buttons[i].y && e.y < buttons[i].y+buttons[i].h) {
+            if (buttons[i].state) {
+                buttons[i].state = false;
+                backAudio.volume = 0;
+            } else {
+                buttons[i].state = true;
+                backAudio.volume = 1;
+            }
+        }
+    }
+}
