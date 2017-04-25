@@ -21,7 +21,10 @@ var imgTriangle = new Image();
 imgTriangle.src = "img/triangle.png";
 
 var imgUnMute = new Image();
-imgUnMute.src = "img/mute.png";
+imgUnMute.src = "img/unMute.png";
+
+var imgMute = new Image();
+imgMute.src = "img/Mute.png";
 
 var backAudio = document.getElementById("backAudio");
 
@@ -268,11 +271,10 @@ buttons.push( new Button(0, 0, 50, 50, true, imgUnMute) );
 
 function gameLoop() {
     context.clearRect(0, 0, 800, 400);
-    
+    field.nextX();
+    drawField();
+    generateMap();
     if ( !field.isLose ) {
-        field.nextX();
-        drawField();
-        generateMap();
         user.jump();
         user.checkGravity();
     } else {
@@ -290,9 +292,11 @@ canvas.onmousedown = function(e) {
             if (buttons[i].state) {
                 buttons[i].state = false;
                 backAudio.volume = 0;
+                buttons[i].image = imgMute;
             } else {
                 buttons[i].state = true;
                 backAudio.volume = 1;
+                buttons[i].image = imgUnMute;
             }
         }
     }
