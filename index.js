@@ -45,7 +45,17 @@ var field = {
     }
 };
 
-Cell = {
+/**
+ * Ячейка куб
+ *
+ * Класс описывает одно из
+ * препятствий, куб
+ *
+ * @author  Alex Zhukov
+ * @version 1.0
+ * @todo    Протестировать класс
+ */
+CellCube = {
     x : 0,
     y : 300,
     height : 50,
@@ -75,6 +85,18 @@ Cell = {
     }
 };
 
+/**
+ * Ячейка треугольник
+ *
+ * Класс описывает одно из
+ * препятствий, шип. Оно убивает
+ * игрока при любом столкновении
+ * с ним.
+ *
+ * @author  Alex Zhukov
+ * @version 1.0
+ * @todo    Протестировать класс
+ */
 CellTriangle = {
     x : 0,
     y : 300,
@@ -100,6 +122,18 @@ CellTriangle = {
     }
 };
 
+/**
+ * Ячейка пустоты
+ *
+ * Класс описывает одно из
+ * препятствий, шип. Оно убивает
+ * игрока при любом столкновении
+ * с ним.
+ *
+ * @author  Alex Zhukov
+ * @version 1.0
+ * @todo    Протестировать класс
+ */
 CellBlank = {
     x : 0,
     y : 300,
@@ -243,7 +277,7 @@ function generateRow(i) {
         }
         distance[i] += 50;
         if (map[i][ countGenerate[i] ] == "0") {
-            var cell = Object.create(Cell);
+            var cell = Object.create(CellCube);
             cell.x = distance[i] + field.width;
             cell.y = cell.y - 50 * i;
             elements[i].push( cell );
@@ -261,7 +295,7 @@ function generateRow(i) {
     }
 };
 
-function drawButton(button){
+function drawButton(button) {
     context.drawImage(button.image, button.x, button.y, button.w, button.h);
 };
 
@@ -279,7 +313,7 @@ var buttons = Array();
 buttons.push( new Button(0, 0, 50, 50, true, imgUnMute, "volume") );
 buttons.push( new Button(field.width - 50, 0, 50, 50, true, imgRestart, "restart") );
 
-function drawButtons(){
+function drawButtons() {
     for (var i = 0; i < buttons.length; i++) {
         drawButton(buttons[i]);
     }
@@ -295,14 +329,14 @@ function gameLoop() {
         user.checkGravity();
     } else {
         
-        //user.lose();  
+        //user.lose();
     } 
     draw(); 
     drawButtons();
     requestAnimationFrame(gameLoop);
 };
 
-function buttonVolume(button){
+function buttonVolume(button) {
      if (button.state) {
             button.state = false;
             backAudio.volume = 0;
@@ -314,7 +348,7 @@ function buttonVolume(button){
         }
 }; 
 
-function buttonRestart(button){
+function buttonRestart(button) {
     field.isLose = false;
     restartMap();
     initMap();
