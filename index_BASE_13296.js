@@ -100,14 +100,6 @@ CellTriangle = {
     }
 };
 
-/**
- * Ячейка пустоты
- *
- * Класс описывает пустую ячейку.
- *
- * @author  Alex Zhukov
- * @version 1.0
- */
 CellBlank = {
     x : 0,
     y : 300,
