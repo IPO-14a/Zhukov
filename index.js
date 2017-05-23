@@ -128,6 +128,7 @@ var field = {
     * значения x.
     */
     draw : function () {
+        context.clearRect(0, 0, 800, 400);
         context.drawImage(imgBackground, field.x, 0, field.width, field.height);
         context.drawImage(imgBackground, field.x + field.width - 5, 0, field.width, field.height);
         context.drawImage(imgPlatform, field.x, 400 - 50, field.width, 50);
@@ -221,7 +222,6 @@ Cell = {
             && user.y < this.y + this.height) {
             field.speed = 0;
             field.isLose = true;
-
         }
         else if (255 >= this.x && 205 <= this.x + this.width && user.y == this.y - this.height && !user.isJumping) {
             user.isOnPlatform = true;
@@ -749,17 +749,13 @@ function drawButtons(){
 * к вызову следующего шага игрового
 * цикла.
 */
-function gameLoop() {
-    context.clearRect(0, 0, 800, 400);
+function gameLoop() { 
     field.nextX();
     field.draw();
     generateMap();
     if ( !field.isLose ) {
         user.jump();
         user.checkGravity();
-    } else {
-        
-        //user.lose();  
     } 
     user.draw(); 
     drawButtons();

@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- This document was created with Syntext Serna Free. --><!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "docbookV4.5/docbookx.dtd" []>
+<article>
+  <articleinfo>
+    <title>Geometry Dash</title>
+    <author>
+      <surname>Жуков</surname>
+      <firstname>Алексей</firstname>
+    </author>
+    <copyright>
+      <year>2017</year>
+      <holder>Alex Zhukov</holder>
+    </copyright>
+  </articleinfo>
+  <para>Раннер Geometry Dash  предлагает несколько режимов игры. Первый заключается в последовательном прохождении уровней, а второй в прохождении динамически генерируемого уровня. Последний предназначен для игры на рекорд.</para>
+  <para>Игра предназначена для всех браузеров, исключая Internet Explorer.</para>
+  <section>
+    <title>Пример использования 1</title>
+    <para>Функция представляет собой инициализацию игрового цикла. Она является начальной точкой для данного приложения.</para>
+    <programlisting>window.onload = function() {
+    window.onkeydown = function(e) {
+        if (user.isOnPlatform &amp;&amp; e.keyCode == 32) {
+            user.canJump = true;
+            user.heightJump = 130 + (user.y - 300) * -1;
+        }
+    };
+    backAudio.play();
+    initMap();
+    gameLoop();
+};
+</programlisting>
+  </section>
+  <section>
+    <title>Пример использования 2</title>
+    <para>Основной логикой игры является преодаливание различных припятствий, при столкновении с ними пользователь проигрывает. Данный метод предназначен для обработки столкновений.</para>
+    <programlisting>checkCollision : function() {
+        if (250 &gt; this.x &amp;&amp; 200 &lt; this.x + this.width &amp;&amp; user.y &gt; this.y - this.height
+            &amp;&amp; user.y &lt; this.y + this.height) {
+            field.speed = 0;
+            field.isLose = true;
+        }
+        else if (255 &gt;= this.x &amp;&amp; 205 &lt;= this.x + this.width &amp;&amp; user.y == this.y - this.height &amp;&amp; !user.isJumping) {
+            user.isOnPlatform = true;
+        }
+        else if ( 200 &gt; this.x + this.width &amp;&amp; 200 &lt; this.x + this.width + 10 &amp;&amp; this.y == user.y + 50) {
+            user.isOnPlatform = false;
+        }
+    }</programlisting>
+  </section>
+  <section>
+    <title>Пример использования 3</title>
+    <para>Весь игровой цикл организован через вызов функции gameLoop. Она представлена ниже.</para>
+    <programlisting>function gameLoop() { 
+    field.nextX();
+    field.draw();
+    generateMap();
+    if ( !field.isLose ) {
+        user.jump();
+        user.checkGravity();
+    } 
+    user.draw(); 
+    drawButtons();
+    requestAnimationFrame(gameLoop);
+};</programlisting>
+  </section>
+</article>
